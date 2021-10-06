@@ -67,9 +67,9 @@ class PhoneCallEvent {
   @override
   String toString() {
     return 'PhoneCallEvent{status: ${value(status)}, '
-        'id: ${truncate(call?.id, 12)} '
-        'callId: ${truncate(call?.callId, 12) ?? '-'}, '
-        'phoneNumber: ${call?.phoneNumber ?? '-'}}';
+        'id: ${truncate(call.id, 12)} '
+        'callId: ${truncate(call.callId, 12) ?? '-'}, '
+        'phoneNumber: ${call.phoneNumber ?? '-'}}';
   }
 }
 

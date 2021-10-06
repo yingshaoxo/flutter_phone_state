@@ -58,7 +58,7 @@ class FlutterPhoneState with WidgetsBindingObserver {
   List<PhoneCall> _calls = <PhoneCall>[];
 
   /// Finds a previously placed call that matches the incoming event
-  PhoneCall _findMatchingCall(RawPhoneEvent event) {
+  PhoneCall? _findMatchingCall(RawPhoneEvent event) {
     // Either the first matching, or the first one without an ID
     PhoneCall? matching;
     if (event.id != null) {
@@ -69,7 +69,7 @@ class FlutterPhoneState with WidgetsBindingObserver {
       // Link them together for future reference
       matching.callId = event.id;
     }
-    return matching!;
+    return matching;
   }
 
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -150,7 +150,7 @@ class FlutterPhoneState with WidgetsBindingObserver {
   _handleRawPhoneEvent(RawPhoneEvent? event) async {
     try {
       _pruneCalls();
-      PhoneCall matching = _findMatchingCall(event!);
+      PhoneCall? matching = _findMatchingCall(event!);
 
       /// If no match was found?
       if (matching == null && event.isNewCall) {
@@ -262,14 +262,14 @@ String sanitizePhoneNumber(String input) {
   return out;
 }
 
-bool _isNumeric(String str) {
+bool _isNumeric(String? str) {
   if (str == null) {
     return false;
   }
   return double.tryParse(str) != null;
 }
 
-Future<LinkOpenResult> _openTelLink(String appLink) async {
+Future<LinkOpenResult> _openTelLink(String? appLink) async {
   if (appLink == null) {
     return LinkOpenResult.invalidInput;
   }
