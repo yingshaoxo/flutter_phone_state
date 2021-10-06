@@ -15,10 +15,10 @@ class RawPhoneEvent {
   /// android: always null
   /// ios: a uuid
   /// others: ??
-  final String id;
+  final String? id;
 
   /// If available, the phone number being dialed.
-  final String phoneNumber;
+  final String? phoneNumber;
 
   /// The type of call event.
   final RawEventType type;
@@ -61,7 +61,7 @@ class PhoneCallEvent {
   /// @non_null
   final DateTime timestamp;
 
-  PhoneCallEvent(this.call, this.status, [DateTime eventDate])
+  PhoneCallEvent(this.call, this.status, [DateTime? eventDate])
       : timestamp = eventDate ?? DateTime.now();
 
   @override
@@ -82,15 +82,15 @@ class PhoneCall {
 
   /// An id assigned to the call by the underlying os
   /// @nullable
-  String callId;
+  String? callId;
 
   /// The phone number being dialed, or the inbound number
   /// @nullabe
-  String phoneNumber;
+  String? phoneNumber;
 
   /// The current status of the call
   /// @non_null
-  PhoneCallStatus status;
+  PhoneCallStatus? status;
 
   /// Whether the call is inbound or outbound
   /// @non_null
@@ -106,12 +106,12 @@ class PhoneCall {
   bool _isComplete = false;
 
   /// Used internally to track the call events, can be subscribed to, or awaited on.
-  StreamController<PhoneCallEvent> _eventStream;
+  StreamController<PhoneCallEvent>? _eventStream;
 
   /// The final call duration.  See [duration]
-  Duration _duration;
+  Duration? _duration;
 
-  PhoneCall.start(this.phoneNumber, this.placement, [String id])
+  PhoneCall.start(this.phoneNumber, this.placement, [String? id])
       : status = null,
         id = id ?? Uuid().v4(),
         events = <PhoneCallEvent>[],
@@ -134,7 +134,7 @@ class PhoneCall {
     final event = recordStatus(status);
     _isComplete = true;
     if (_eventStream?.isClosed == false) {
-      await _eventStream.close();
+      await _eventStream!.close();
       return event;
     } else {
       return event;
@@ -240,9 +240,9 @@ const Map<RawEventType, Set<PhoneCallStatus>> priorStatuses = {
   },
 };
 
-bool isNotBefore(PhoneCallStatus status, RawEventType type) =>
+bool isNotBefore(PhoneCallStatus? status, RawEventType type) =>
     !isBefore(status, type);
 
-bool isBefore(PhoneCallStatus status, RawEventType type) {
+bool isBefore(PhoneCallStatus? status, RawEventType type) {
   return priorStatuses[type]?.contains(status) == true;
 }

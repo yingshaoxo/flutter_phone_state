@@ -1,18 +1,29 @@
+import 'package:collection/collection.dart' show IterableExtension;
+
 Duration sinceNow(DateTime self) => -(self.difference(DateTime.now()));
 
-X find<X>(List<X> self, [bool filter(X input)]) {
-  return self?.firstWhere(filter, orElse: () => null);
+X? find<X>(List<X> self, [bool filter(X input)?]) {
+  if (filter == null) {
+    return null;
+  }
+  return self.firstWhereOrNull(filter);
 }
 
-X lastOrNull<X>(List<X> self, [bool filter(X input)]) {
-  return self?.lastWhere(filter, orElse: () => null);
+X? lastOrNull<X>(List<X> self, [bool filter(X input)?]) {
+  if (filter == null) {
+    return null;
+  }
+  return self.lastWhereOrNull(filter);
 }
 
-X firstOrNull<X>(List<X> self, [bool filter(X input)]) {
-  return self?.firstWhere(filter, orElse: () => null);
+X? firstOrNull<X>(List<X> self, [bool filter(X input)?]) {
+  if (filter == null) {
+    return null;
+  }
+  return self.firstWhereOrNull(filter);
 }
 
-String truncate(String self, int length) {
+String? truncate(String? self, int length) {
   if (self == null) return self;
   if (self.length <= length) {
     return self;
@@ -21,17 +32,20 @@ String truncate(String self, int length) {
   }
 }
 
-bool isNullOrEmpty(String self) {
-  return self?.isNotEmpty != true;
+bool isNullOrEmpty(String? self) {
+  if (self == null) {
+    return true;
+  }
+  return self.isEmpty;
 }
 
 bool isNotNullOrEmpty(String self) => isNullOrEmpty(self);
 
-bool isNullOrBlank(String self) => self == null || self.trim().isEmpty == true;
+bool isNullOrBlank(String? self) => self == null || self.trim().isEmpty == true;
 
 bool isNotNullOrBlank(String self) => !isNullOrBlank(self);
 
-String orEmpty(String self) {
+String orEmpty(String? self) {
   if (self == null) return "";
   return self;
 }

@@ -19,17 +19,17 @@ final _instance = FlutterPhoneState();
 
 class FlutterPhoneState with WidgetsBindingObserver {
   /// Configures logging.  FlutterPhoneState uses the [logging] plugin.
-  static void configureLogs({Level level, Logging onLog}) {
+  static void configureLogs({Level? level, Logging? onLog}) {
     configureLogging(logger: _log, level: level, onLog: onLog);
   }
 
-  static Future<String> get platformVersion async {
-    final String version = await _channel.invokeMethod('getPlatformVersion');
+  static Future<String?> get platformVersion async {
+    final String? version = await _channel.invokeMethod('getPlatformVersion');
     return version;
   }
 
   /// A broadcast stream of raw events from the underlying phone state.  It's preferred to use [phoneCallEvents]
-  static Stream<RawPhoneEvent> get rawPhoneEvents => _initializedNativeEvents;
+  static Stream<RawPhoneEvent?>? get rawPhoneEvents => _initializedNativeEvents;
 
   /// A list of events associated to all calls.  This includes events from the underlying OS, as well as our
   /// own cancellation and timeout errors
@@ -47,8 +47,8 @@ class FlutterPhoneState with WidgetsBindingObserver {
 
   FlutterPhoneState() {
     configureLogging(logger: _log);
-    WidgetsBinding.instance.addObserver(this);
-    _initializedNativeEvents.forEach(_handleRawPhoneEvent);
+    WidgetsBinding.instance!.addObserver(this);
+    _initializedNativeEvents!.forEach(_handleRawPhoneEvent);
   }
 
   /// A list of active calls.  Theoretically, you could initiate a call while the first is still in flight.
@@ -60,7 +60,7 @@ class FlutterPhoneState with WidgetsBindingObserver {
   /// Finds a previously placed call that matches the incoming event
   PhoneCall _findMatchingCall(RawPhoneEvent event) {
     // Either the first matching, or the first one without an ID
-    PhoneCall matching;
+    PhoneCall? matching;
     if (event.id != null) {
       matching = firstOrNull(_calls, (c) => c.callId == event.id);
     }
@@ -69,7 +69,7 @@ class FlutterPhoneState with WidgetsBindingObserver {
       // Link them together for future reference
       matching.callId = event.id;
     }
-    return matching;
+    return matching!;
   }
 
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -147,10 +147,10 @@ class FlutterPhoneState with WidgetsBindingObserver {
     }
   }
 
-  _handleRawPhoneEvent(RawPhoneEvent event) async {
+  _handleRawPhoneEvent(RawPhoneEvent? event) async {
     try {
       _pruneCalls();
-      PhoneCall matching = _findMatchingCall(event);
+      PhoneCall matching = _findMatchingCall(event!);
 
       /// If no match was found?
       if (matching == null && event.isNewCall) {
@@ -210,10 +210,10 @@ final EventChannel _phoneStateCallEventChannel =
     EventChannel('co.sunnyapp/phone_events');
 
 /// Native event stream, lazily created.  See [nativeEvents]
-Stream<RawPhoneEvent> _nativeEvents;
+Stream<RawPhoneEvent?>? _nativeEvents;
 
 /// A stream of [RawPhoneEvent] instances.  The stream only contains null values if there was an error
-Stream<RawPhoneEvent> get _initializedNativeEvents {
+Stream<RawPhoneEvent?>? get _initializedNativeEvents {
   _nativeEvents ??=
       _phoneStateCallEventChannel.receiveBroadcastStream().map((dyn) {
     try {
@@ -223,9 +223,9 @@ Stream<RawPhoneEvent> get _initializedNativeEvents {
             "Expected Map<String, dynamic> but got ${dyn?.runtimeType ?? 'null'} ");
       }
       final Map<String, dynamic> event = (dyn as Map).cast();
-      final eventType = _parseEventType(event["type"] as String);
+      final eventType = _parseEventType(event["type"] as String?);
       return RawPhoneEvent(
-          event["id"] as String, event["phoneNumber"] as String, eventType);
+          event["id"] as String?, event["phoneNumber"] as String?, eventType);
     } catch (e, stack) {
       _log.severe("Error handling native event $e", e, stack);
       return null;
@@ -234,7 +234,7 @@ Stream<RawPhoneEvent> get _initializedNativeEvents {
   return _nativeEvents;
 }
 
-RawEventType _parseEventType(String dyn) {
+RawEventType _parseEventType(String? dyn) {
   switch (dyn) {
     case "inbound":
       return RawEventType.inbound;
