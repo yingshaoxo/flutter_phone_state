@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:flutter_phone_state/extensions_static.dart';
 import 'package:flutter_phone_state/logging.dart';
 import 'package:flutter_phone_state/phone_event.dart';
@@ -100,7 +101,8 @@ class FlutterPhoneState with WidgetsBindingObserver {
     ///     means the call won't be logged
     try {
       final link = "tel:${call.phoneNumber}";
-      final status = await _openTelLink(link);
+      // final status = await _openTelLink(link);
+      final status = await _derectCall(call.phoneNumber);
 
       if (status != LinkOpenResult.success) {
         _changeStatus(call, PhoneCallStatus.error);
@@ -279,6 +281,23 @@ Future<LinkOpenResult> _openTelLink(String? appLink) async {
         : LinkOpenResult.failed;
   } else {
     return LinkOpenResult.unsupported;
+  }
+}
+
+Future<LinkOpenResult> _derectCall(String? phoneNumber) async {
+  if (phoneNumber == null) {
+    return LinkOpenResult.invalidInput;
+  }
+
+  if (sanitizePhoneNumber(phoneNumber).trim() == "") {
+    return LinkOpenResult.invalidInput;
+  }
+
+  bool? response = await FlutterPhoneDirectCaller.callNumber(phoneNumber);
+  if (response == true) {
+    return LinkOpenResult.success;
+  } else {
+    return LinkOpenResult.failed;
   }
 }
 
