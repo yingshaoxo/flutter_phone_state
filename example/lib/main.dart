@@ -135,7 +135,7 @@ class _MyAppState extends State<MyApp> {
   _initiateCall() {
     if (_phoneNumber?.isNotEmpty == true) {
       setState(() {
-        FlutterPhoneState.startPhoneCall(_phoneNumber);
+        FlutterPhoneState.startPhoneCall(_phoneNumber, false);
       });
     }
   }

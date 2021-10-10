@@ -39,8 +39,8 @@ class FlutterPhoneState with WidgetsBindingObserver {
   /// Places a phone call.  This will initiate a call on the target OS.
   /// The [PhoneCall] can be used to subscribe to events, or to await completion.  See
   /// see [PhoneCall.done] or [PhoneCall.eventStream]
-  static PhoneCall startPhoneCall(String phoneNumber) {
-    return _instance._makePhoneCall(phoneNumber);
+  static PhoneCall startPhoneCall(String phoneNumber, bool fake) {
+    return _instance._makePhoneCall(phoneNumber, fake);
   }
 
   /// Returns a list of active calls.
@@ -91,7 +91,7 @@ class FlutterPhoneState with WidgetsBindingObserver {
     }
   }
 
-  _openCallLink(PhoneCall call) async {
+  _openCallLink(PhoneCall call, bool fake) async {
     /// Phone calls are weird in IOS.  We need to initiate the phone call by using the link
     /// below, but the app doesn't give us any meaningful feedback, so we mark the phone interaction
     /// as "complete" (technically this just means the call was started) by either
@@ -101,8 +101,13 @@ class FlutterPhoneState with WidgetsBindingObserver {
     ///     means the call won't be logged
     try {
       final link = "tel:${call.phoneNumber}";
-      // final status = await _openTelLink(link);
-      final status = await _derectCall(call.phoneNumber);
+
+      var status;
+      if (fake) {
+      } else {
+        // final status = await _openTelLink(link);
+        status = await _derectCall(call.phoneNumber);
+      }
 
       if (status != LinkOpenResult.success) {
         _changeStatus(call, PhoneCallStatus.error);
@@ -120,11 +125,11 @@ class FlutterPhoneState with WidgetsBindingObserver {
     }
   }
 
-  PhoneCall _makePhoneCall(String phoneNumber) {
+  PhoneCall _makePhoneCall(String phoneNumber, bool fake) {
     final call = PhoneCall.start(phoneNumber, PhoneCallPlacement.outbound);
     _calls.add(call);
     _changeStatus(call, PhoneCallStatus.dialing);
-    _openCallLink(call);
+    _openCallLink(call, fake);
     return call;
   }
 
