@@ -104,6 +104,7 @@ class FlutterPhoneState with WidgetsBindingObserver {
 
       var status;
       if (fake) {
+        status = LinkOpenResult.success;
       } else {
         // final status = await _openTelLink(link);
         status = await _derectCall(call.phoneNumber);
